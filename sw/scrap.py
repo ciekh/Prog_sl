@@ -4,9 +4,10 @@ import re
 import networkx as nx
 
 
-html_doc = r"../data/j.html"
+
 
 def openf(path):
+    '''Open the file html and create soup object'''
     with open(html_doc,encoding ='utf8') as f:
         html = f.read()
         soup = BeautifulSoup(html,'html.parser')
@@ -14,9 +15,9 @@ def openf(path):
 
 
 def cleanf(soup):
-
+    '''this function takes in input soup object and clena data.
+    it return a list that contains lists where each one is the set of artists that have collaboreted to an album'''
     lista = []
-
     for psg in soup.find_all('p'):
         if psg.find('strong'):
             if  "Rec." in psg.find('strong').text:
@@ -24,9 +25,7 @@ def cleanf(soup):
                 tex = text.replace(' plus ',',')
                 te = tex.replace('/', ',')
                 lista.append(te.split(','))
-
-
-    #print(lista[77])
+#######################################
     for lis in lista:
         for j in range(len(lis)):
             nome = lis[j]
@@ -34,13 +33,8 @@ def cleanf(soup):
                 if nome[i] == "(":
                     nome1 = nome[:i-1]
                     lis[j] = nome1
-                    
-            
-
-    #print(lista[77])
+####################################     
     set_album = []
-
-
     for lis in lista:
         album = []
         for i in range(len(lis)):
@@ -68,6 +62,7 @@ def cleanf(soup):
 
 
 def makedict(set_album):
+    '''This function takes in input the all set of albums and returns a dictionary where keys are tuples of two artists and value the number of collaborations '''
     final_list = []
     tot_coll = dict()
     for album in set_album:
@@ -88,6 +83,7 @@ def makedict(set_album):
 
 
 def create_graph(dic):
+    "make a graph where nodes are artist and number of collaboration are the weight of the edges"
     G = nx.Graph()
     for val in dic:
         G.add_edge(val[0], val[1], weight=dic[val])
