@@ -92,11 +92,12 @@ def create_graph(dic):
     return G
 
 
-def compute_good_local_community(graph):
+def compute_good_local_community(graph,inp):
     
     teleporting_distribution = {}
     for node_id in graph:
-        teleporting_distribution[node_id] = 1./graph.number_of_nodes()
+        teleporting_distribution[node_id] = 0
+    teleporting_distribution[inp] = 1.
     
     #
     # Computation of the PageRank vector.
@@ -147,4 +148,5 @@ if __name__ == "__main__":
     clean_soup = cleanf(soup)
     col = makedict(clean_soup)
     g = create_graph(col)
-    print(compute_good_local_community(g))
+    print(compute_good_local_community(g,"Glenn Miller "))
+    print(len(compute_good_local_community(g,"Glen Miller")[0]))
