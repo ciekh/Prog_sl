@@ -4,8 +4,8 @@ import re
 import networkx as nx
 
 
-
-
+'''We used Beautiful Soup to clean the data.
+It is a Python library for pulling data out of HTML and XML files.''' 
 def openf(path):
     '''Open the file html and create soup object'''
     with open(html_doc,encoding ='utf8') as f:
@@ -15,7 +15,7 @@ def openf(path):
 
 
 def cleanf(soup):
-    '''this function takes in input soup object and clena data.
+    '''this function takes in input soup object and clean data.
     it return a list that contains lists where each one is the set of artists that have collaboreted to an album'''
     lista = []
     for psg in soup.find_all('p'):
@@ -51,9 +51,7 @@ def cleanf(soup):
                         else:
                             album.append(word.strip())
             elif  word[0].islower():
-                    pass
-                    
-                    
+                    pass    
             elif word[0].isupper():
                 if "Rec." in word:
                     pass
@@ -64,7 +62,8 @@ def cleanf(soup):
 
 
 def makedict(set_album):
-    '''This function takes in input the all set of albums and returns a dictionary where keys are tuples of two artists and value the number of collaborations '''
+    '''This function takes in input the all set of albums and returns a dictionary
+    where keys are tuples of two artists and value the number of collaborations '''
     final_list = []
     tot_coll = dict()
     for album in set_album:
@@ -90,6 +89,19 @@ def create_graph(dic):
     for val in dic:
         G.add_edge(val[0], val[1], weight=dic[val])
     return G
+
+def compute_max_degree(G):
+    "compute the node with max degree"
+    max_degree = float("-inf")
+    for nodo in G:
+        degree = G.degree()[nodo] 
+        if degree > max_degree:
+            max_degree = degree
+            node_max_degree = nodo
+    return node_max_degree,max_degree
+
+
+
 
 
 def compute_good_local_community(graph,inp):
@@ -143,10 +155,21 @@ def compute_good_local_community(graph,inp):
 
 
 if __name__ == "__main__":
+    #input file
     html_doc = r"../data/j.html"
+
     soup = openf(html_doc)
     clean_soup = cleanf(soup)
-    col = makedict(clean_soup)
-    g = create_graph(col)
-    print(compute_good_local_community(g,"Glenn Miller "))
-    print(len(compute_good_local_community(g,"Glen Miller")[0]))
+    collaboration = makedict(clean_soup)
+    graph_coll = create_graph(collaboration)
+    node_with_max_degree = compute_max_degree(graph_coll)
+
+
+
+    print("Node with max degree: " + node_with_max_degree[0])
+    print("Degree: " + str(node_with_max_degree[1]))
+
+
+    print("Community: " + str(compute_good_local_community(graph_coll,node_with_max_degree[0])[0]))
+    print("Conductance: " + str(compute_good_local_community(graph_coll,node_with_max_degree[0])[1]))
+    print("Length: " + str(len(compute_good_local_community(graph_coll,node_with_max_degree[0])[0])))
